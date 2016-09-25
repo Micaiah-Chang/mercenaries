@@ -1,0 +1,128 @@
+## for making declaration orders
+
+import sys
+import random
+import math
+
+def doItWithRawNumbers(nums):
+
+    lowestUnassigned = 1
+    declarePool = []
+    declarePool.append(1)
+    declarePool.append(2)
+    declarePool.append(3)
+    declarePool.append(4)
+    declarePool.append(5)
+    assignedDeclares = []
+    declareList = {}
+    
+    i = 5
+    
+    lowerBound = 1
+    upperBound = 24
+    autoAssignCurrent = False
+    
+    for leader in nums:
+        i = i + 1
+        
+        # if we're about to pass a point where a number can be assigned
+        if(lowerBound == (leader-4)):
+            # check if it's been assigned yet, if not we must assign it now to a random eligible team
+            # first we do a stupid trick to determine whether we want to assign it to this current one
+            # then we begin in earnest
+            if lowerBound not in assignedDeclares:
+                ######print("on entry", declareList)
+                #print(declarePool)
+                #append it to the list of the assigned declarations
+                assignedDeclares.append(lowerBound)
+                #replace an eligible leader's declaration order with this one
+                toReplace = random.randint(lowerBound, leader)
+                # cheap trick for edge case
+                if(toReplace == leader):
+                    ######print("We're assigning the current one", leader, declarePool, declareList)
+                    autoAssignCurrent = True
+                else:
+                    # otherwise proceed as normal
+                    oldOrder = declareList[toReplace]
+                    ######print("replacing", declareList[toReplace])
+                    #reroll the rng if you try to replace one that's lower than the lower bound
+                    while(declareList[toReplace] < lowerBound):
+                        ######print("No good rerolling")
+                        toReplace = random.randint(lowerBound, leader-1)
+                        oldOrder = declareList[toReplace]
+                    ######print("replacing", declareList[toReplace])
+                    declareList[toReplace] = lowerBound
+                    #remove the record we've assigned this old one
+                    assignedDeclares.remove(oldOrder)
+                    #replace it in the declare pool appropriately and carry on
+                    ######print(declarePool)
+                    for elem in declarePool:
+                        if elem == lowerBound:
+                            ######print("Does this happen ever", elem, oldOrder)
+                            declarePool.remove(elem)
+                            declarePool.append(oldOrder)
+                            break
+
+                ######print("on exit", declareList)
+                ######print(declarePool)
+                
+            lowerBound = lowerBound+1
+
+                
+            # increment the lower bound
+        
+        if(autoAssignCurrent == True):
+            
+            ######print("We're assigning the current one", leader, declarePool, declareList)
+            declareList[leader] = lowerBound-1
+            declarePool.remove(lowerBound-1)
+            if i <= upperBound:
+                declarePool.append(i)
+            autoAssignCurrent = False
+            ######print("We've assigned the current one", leader, declarePool, declareList)
+        
+        else:
+            # random number stored in the declaration pool is taken to be assigned
+            givenOrder = random.randint(0, len(declarePool)-1)
+            # mark it as assigned
+            assignedDeclares.append(declarePool[givenOrder])
+            # insert it into the declaration list and replace it in the pool if we haven't hit the maximum
+            declareList[leader] = declarePool[givenOrder]
+            if i <= upperBound:
+                declarePool[givenOrder] = i
+            else:
+                del declarePool[givenOrder]
+    
+    checkDeclareListValidity(declareList)
+    printList(declareList)
+
+def checkDeclareListValidity(list):
+    
+    dupeChk = []
+    #print("checking", list)
+    for elem in list.keys():
+        if(list[elem] not in dupeChk):
+            dupeChk.append(list[elem])
+        else:
+            print("duplicate", elem)
+        if list[elem] > elem+4:
+            print("too large", elem)
+        elif list[elem] < elem-4:
+            print("too small", elem)    
+    
+def printList(list):
+
+    for elem in list.keys():
+        print(elem,"->",list[elem])
+    
+def main(argv):
+    
+    declares = []
+    
+    for i in range(1, 25):
+        declares.append(i)
+    
+    doItWithRawNumbers(declares)
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
