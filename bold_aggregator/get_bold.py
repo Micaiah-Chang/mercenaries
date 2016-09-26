@@ -41,9 +41,7 @@ def merge_user_bolds(collected_bolds, current_user, post_number, user_bolds):
 
 def bold_in_post(post):
 
-    collected_bold = [tag.b.extract() for tag in post.descendants
-                      if isinstance(tag, Tag) and
-                      tag.b is not None]
+    collected_bold = [tag for tag in post.find_all('b')]
     return collected_bold
 
 
