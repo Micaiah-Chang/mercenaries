@@ -86,13 +86,15 @@ def write_to_file(result_filename, collected_bold_dict):
     if not collected_bold_dict:
         return
 
+    result_string = ''
     for user, bold_collections in collected_bold_dict.iteritems():
         stringified_bold_collection = map(serialize_bold_collection, bold_collections)
         bold_collection_result = '\n'.join(stringified_bold_collection)
         result_row = "User: %s\n%s" % (user, bold_collection_result)
+        result_string += result_row + '\n\n---\n\n'
 
     with open(result_filename, 'w') as txt_file:
-        txt_file.write(result_row)
+        txt_file.write(result_string)
 
 
 def main():
