@@ -82,6 +82,15 @@ def serialize_bold_collection(bold_collection):
     result_string = 'Post Number: %d\n%s\n' % (post_number, entity_unescape(bold))
     return result_string
 
+
+def combine_bold(bolds):
+    result = defaultdict(list)
+    for bold_collection in bolds:
+        for user, bold_collection in bold_collection.iteritems():
+            result[user].extend(bold_collection)
+
+    return result
+
 def write_to_file(result_filename, collected_bold_dict):
     if not collected_bold_dict:
         return
@@ -103,8 +112,9 @@ def main():
 
     collected_bolds = map(iterate_through_posts, page_files)
 
+    combined_bolds = combine_bold(collected_bolds)
     entries = zip(result_files, collected_bolds)
-    map(lambda args: write_to_file(*args), entries)
+    write_to_file('result/result.txt', combined_bolds)
 
 if __name__ == '__main__':
     main()
